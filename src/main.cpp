@@ -1,30 +1,84 @@
-/*
- * Blink
- * Turns on an LED on for one second,
- * then off for one second, repeatedly.
- */
-
 #include <Arduino.h>
+#include <FastLED.h>
 
-// Set LED_BUILTIN if it is not defined by Arduino framework
-#ifndef LED_BUILTIN
-    #define LED_BUILTIN 2
-#endif
+// How many leds in your strip?
+#define NUM_LEDS 10
 
-void setup()
-{
-  // initialize LED digital pin as an output.
-  pinMode(LED_BUILTIN, OUTPUT);
+// For led chips like WS2812, which have a data line, ground, and power, you just
+// need to define DATA_PIN.  For led chipsets that are SPI based (four wires - data, clock,
+// ground, and power), like the LPD8806 define both DATA_PIN and CLOCK_PIN
+// Clock pin only needed for SPI based chipsets when not using hardware SPI
+#define DATA_PIN 16
+#define TEST_PIN 4
+// #define CLOCK_PIN 13
+
+// Define the array of leds
+CRGB leds[NUM_LEDS];
+
+void setup() {
+    // Uncomment/edit one of the following lines for your leds arrangement.
+    // ## Clockless types ##
+    FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);  // GRB ordering is assumed
+    pinMode(TEST_PIN, OUTPUT);
+    pinMode(LED_BUILTIN, OUTPUT);
+    const int pins[] = {4, 2,5};
+    // const int numPins = sizeof(pins);
+    for (auto i = 0; i < 3; i++) {
+        pinMode(pins[i], OUTPUT);
+        digitalWrite(pins[i], HIGH);
+    }
+    //
+    // FastLED.addLeds<SM16703, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<TM1829, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<TM1812, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<TM1809, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<TM1804, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<TM1803, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<UCS1903, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<UCS1903B, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<UCS1904, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<UCS2903, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<WS2812, DATA_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
+    // FastLED.addLeds<WS2852, DATA_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
+    // FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
+    // FastLED.addLeds<GS1903, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<SK6812, DATA_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
+    // FastLED.addLeds<SK6822, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<APA106, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<PL9823, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<SK6822, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<WS2813, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<APA104, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<WS2811_400, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<GE8822, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<GW6205, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<GW6205_400, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<LPD1886, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<LPD1886_8BIT, DATA_PIN, RGB>(leds, NUM_LEDS);
+    // ## Clocked (SPI) types ##
+    // FastLED.addLeds<LPD6803, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
+    // FastLED.addLeds<LPD8806, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // GRB ordering is typical
+    // FastLED.addLeds<WS2801, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<WS2803, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<SM16716, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
+    // FastLED.addLeds<P9813, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // BGR ordering is typical
+    // FastLED.addLeds<DOTSTAR, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // BGR ordering is typical
+    // FastLED.addLeds<APA102, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // BGR ordering is typical
+    // FastLED.addLeds<SK9822, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // BGR ordering is typical
 }
 
-void loop()
-{
-  // turn the LED on (HIGH is the voltage level)
+void loop() {
+  // Turn the LED on, then pause
+  leds[0] = CRGB::Red;
+  FastLED.show();
+  digitalWrite(TEST_PIN, HIGH);
   digitalWrite(LED_BUILTIN, HIGH);
-  // wait for a second
-  delay(1000);
-  // turn the LED off by making the voltage LOW
+  delay(2000);
+  // Now turn the LED off, then pause
+  leds[0] = CRGB::Black;
+  digitalWrite(TEST_PIN, LOW);
   digitalWrite(LED_BUILTIN, LOW);
-   // wait for a second
-  delay(1000);
+  FastLED.show();
+  delay(200);
 }
