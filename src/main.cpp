@@ -1,5 +1,7 @@
 #include <Arduino.h>
+#include <string>
 #include <FastLED.h>
+#include <BLEDevice.h>
 #include "heltec.h"
 #define J9 22
 #define J11 23
@@ -9,16 +11,30 @@
 
 CRGB leds[NUM_LEDS];
 #define DATA_PIN 22
-uint8_t pikachu_width = 128;
-uint8_t pikachu_height = 64;
-uint8_t pikachu_bits[128*64];
-void drawPikachu(OLEDDisplay *display)
+
+OLEDDisplay *oled;
+
+class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
+    void onResult(BLEAdvertisedDevice advertisedDevice) {
+      oled->drawString(0, 30, "BLE Advertised Device found: ");
+      oled->drawString(0, 40, advertisedDevice.toString().c_str());
+    }
+};
+
+void scanForBleDevices()
 {
-for (int i = 0; i < 128*64; i++)
-{
-  pikachu_bits[i] = 255;
-}
-  display->drawXbm(0, 0, pikachu_width, pikachu_height, pikachu_bits);
+  BLEDevice::init("");
+  BLEScan *pBLEScan = BLEDevice::getScan();
+  pBLEScan->setActiveScan(true);
+  pBLEScan->setInterval(100);
+  pBLEScan->setWindow(99);
+  pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
+  BLEScanResults foundDevices = pBLEScan->start(5, false);
+  oled->drawString(0, 0, "Devices found: ");
+  oled->drawString(0, 10, std::to_string((foundDevices.getCount())).c_str());
+  oled->drawString(0, 20, "Scan done!");
+  pBLEScan->clearResults();
+  delay(2000);
 }
 
 void setup()
@@ -29,25 +45,15 @@ void setup()
   pinMode(SOFT_LED_CHECK, OUTPUT);
   Heltec.begin(true /* DisplayEnable Enable */, false /* LoRa Disable */, true /* Serial Enable */);
   Heltec.display->setContrast(255);
+  oled = Heltec.display;
 }
 
 void loop()
 {
-  auto oled = Heltec.display;
   oled->clear();
-  drawPikachu(oled);
+  scanForBleDevices();
   oled->display();
-
-
-  // if (digitalRead(J9) == HIGH)
-  // {
   static uint8_t hue = 0;
   FastLED.showColor(CHSV(hue++, 255, 255));
   delay(100);
-  // }
-  // else
-  // {
-  //   digitalWrite(J11, LOW);
-
-  // }
 }
