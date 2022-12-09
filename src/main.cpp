@@ -22,6 +22,12 @@ double distance = 0;
 std::string name = "";
 static uint8_t hue = 0;
 
+int lerp(int a, int b, float f)
+{
+  return a + f * (b - a);
+}
+
+
 double rssiToDistance(int rssi)
 {
   int txPower = -59; // hard coded power value. Usually ranges between -59 to -65
@@ -58,12 +64,12 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
 
 void EndScanCallback(BLEScanResults results)
 {
-  distance = rssiToDistance(maxRssi);
+  distance = lerp(distance, rssiToDistance(maxRssi), 0.2);
   if (distance > 50) distance = 50;
 
   strength = map(distance * -1, -50, -1, 0, 100);
   maxRssi = -100;
-  pBLEScan->start(5, EndScanCallback, false);
+  pBLEScan->start(1, EndScanCallback, false);
 }
 void scanForBleDevices()
 {
@@ -72,7 +78,7 @@ void scanForBleDevices()
   pBLEScan->setInterval(100);
   pBLEScan->setWindow(99);
   pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
-  pBLEScan->start(5, EndScanCallback, false);
+  pBLEScan->start(1, EndScanCallback, false);
 }
 
 void setup()
