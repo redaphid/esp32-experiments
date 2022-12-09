@@ -8,3 +8,4 @@
 * We can also use the cheapest possible usb battery chargers
 ## display (oled)
 * [oled library examples](https://github.com/HelTecAutomation/Heltec_ESP32/tree/master/examples/OLED)
+* [image format for drawing to the screen](https://en.wikipedia.org/wiki/X_BitMap)
