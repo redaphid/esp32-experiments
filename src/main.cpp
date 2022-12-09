@@ -3,10 +3,11 @@
 #define J9 22
 #define J11 23
 
-#define NUM_LEDS 10
-#define DATA_PIN 22
-#define SOFT_LED_CHECK 2
+#define SOFT_LED_CHECK 23
+#define NUM_LEDS 30
+
 CRGB leds[NUM_LEDS];
+#define DATA_PIN 22
 void setup()
 {
   pinMode(DATA_PIN, OUTPUT);
@@ -20,17 +21,9 @@ void loop()
 
   // if (digitalRead(J9) == HIGH)
   // {
-    leds[0] = CRGB::Red;
-    FastLED.show();
-    digitalWrite(LED_BUILTIN, HIGH);
-    digitalWrite(SOFT_LED_CHECK, HIGH);
-
-    delay(1000);
-    digitalWrite(LED_BUILTIN, LOW);
-    digitalWrite(SOFT_LED_CHECK, LOW);
-    leds[0] = CRGB::Black;
-    FastLED.show();
-    delay(1000);
+  static uint8_t hue = 0;
+  FastLED.showColor(CHSV(hue++, 255, 255));
+  delay(10);
   // }
   // else
   // {
