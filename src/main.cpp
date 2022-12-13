@@ -3,10 +3,6 @@
 #include <FastLED.h>
 #include <BLEDevice.h>
 #include "heltec.h"
-// using namespace std;
-
-#define J9 22
-#define J11 23
 
 #define NUM_LEDS 20
 
@@ -20,8 +16,8 @@ int maxRssi = -70;
 int strength = 0;
 double distance = 0;
 std::string name = "";
-static uint8_t hue = 0;
 
+static uint8_t hue = 0;
 int lerp(int a, int b, float f)
 {
   return a + f * (b - a);
@@ -81,6 +77,21 @@ void scanForBleDevices()
   pBLEScan->start(1, EndScanCallback, false);
 }
 
+void advertiseBle()
+{
+  BLEServer *pServer = BLEDevice::createServer();
+  BLEService *pService = pServer->createService("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
+  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
+      BLEUUID("beb5483e-36e1-4688-b7f5-ea07361b26a8"),
+      BLECharacteristic::PROPERTY_READ |
+          BLECharacteristic::PROPERTY_WRITE);
+
+
+  pCharacteristic->setValue({0,0,(char)254});
+  pService->start();
+  pServer->getAdvertising()->start();
+}
+
 void setup()
 {
   pinMode(DATA_PIN, OUTPUT);
@@ -92,6 +103,7 @@ void setup()
 
   BLEDevice::init("");
   scanForBleDevices();
+  advertiseBle();
 }
 
 void loop()
